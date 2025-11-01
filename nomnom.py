@@ -1,6 +1,7 @@
 import json
 import datetime
 import streamlit as st
+
 # ================================
 # 🛠️ Konfiguration & Konstanten
 # ================================
@@ -521,7 +522,6 @@ def save_data(data):
 # 🖥️ App-Start
 # ================================
 
-# ✅ Sicherstellen, dass APP_NAME und ICON vor st.set_page_config() definiert sind
 st.set_page_config(page_title=APP_NAME, layout="wide", page_icon=ICON)
 
 st.markdown("""
@@ -590,13 +590,16 @@ with st.container():
             st.warning("Bitte gib einen Namen ein.")
         else:
             try:
+                date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
                 days = DEFAULT_HALTBARKEIT.get(name, 7)
-                expected_date = datetime.datetime.strptime(date_str, "%d.%m.%Y") + datetime.timedelta(days=days)
+                expected_date = date_obj + datetime.timedelta(days=days)
+                days_left = (date_obj - datetime.datetime.now()).days
+
                 st.session_state.lebensmittel.append({
                     "name": name,
                     "date": date_str,
                     "expected": expected_date.strftime("%d.%m.%Y"),
-                    "days_left": days
+                    "days_left": days_left
                 })
                 save_data(st.session_state.lebensmittel)
                 st.success(f"✅ {name} hinzugefügt! Ablauf: {date_str}")
@@ -679,5 +682,4 @@ if expiring:
 
 # --- Footer ---
 st.markdown("---")
-
 st.markdown("💡 *NomNom – Dein persönlicher Küchenhelfer für weniger Verschwendung.*")
