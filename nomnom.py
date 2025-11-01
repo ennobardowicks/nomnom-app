@@ -1,3 +1,6 @@
+import json
+import datetime
+import streamlit as st
 # ================================
 # 🛠️ Konfiguration & Konstanten
 # ================================
@@ -676,4 +679,5 @@ if expiring:
 
 # --- Footer ---
 st.markdown("---")
+
 st.markdown("💡 *NomNom – Dein persönlicher Küchenhelfer für weniger Verschwendung.*")
