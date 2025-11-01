@@ -585,26 +585,27 @@ with st.container():
         date_input = st.date_input("Ablaufdatum", value=datetime.date.today(), key="date_input")
         date_str = date_input.strftime("%d.%m.%Y")
 
-  if st.button("✅ Hinzufügen", key="add_btn"):
-    if not name:
-        st.warning("Bitte gib einen Namen ein.")
-    else:
-        try:
-            date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
-            days = DEFAULT_HALTBARKEIT.get(name, 7)
-            expected_date = date_obj + datetime.timedelta(days=days)
-            days_left = (date_obj - datetime.datetime.now()).days  # ✅ Richtig: Tage bis zum Ablauf
+    # ✅ Jetzt: `if st.button` in der `with st.container()`-Blöcke
+    if st.button("✅ Hinzufügen", key="add_btn"):
+        if not name:
+            st.warning("Bitte gib einen Namen ein.")
+        else:
+            try:
+                date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+                days = DEFAULT_HALTBARKEIT.get(name, 7)
+                expected_date = date_obj + datetime.timedelta(days=days)
+                days_left = (date_obj - datetime.datetime.now()).days
 
-            st.session_state.lebensmittel.append({
-                "name": name,
-                "date": date_str,
-                "expected": expected_date.strftime("%d.%m.%Y"),
-                "days_left": days_left  # ✅ Jetzt richtig!
-            })
-            save_data(st.session_state.lebensmittel)
-            st.success(f"✅ {name} hinzugefügt! Ablauf: {date_str}")
-        except Exception as e:
-            st.error(f"❌ Fehler: {e}")
+                st.session_state.lebensmittel.append({
+                    "name": name,
+                    "date": date_str,
+                    "expected": expected_date.strftime("%d.%m.%Y"),
+                    "days_left": days_left
+                })
+                save_data(st.session_state.lebensmittel)
+                st.success(f"✅ {name} hinzugefügt! Ablauf: {date_str}")
+            except Exception as e:
+                st.error(f"❌ Fehler: {e}")
 
 # In der Liste der Lebensmittel:
 now = datetime.datetime.now()
@@ -688,4 +689,5 @@ if expiring:
 # --- Footer ---
 st.markdown("---")
 st.markdown("💡 *NomNom – Dein persönlicher Küchenhelfer für weniger Verschwendung.*")
+
 
