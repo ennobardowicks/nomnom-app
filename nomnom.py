@@ -629,15 +629,7 @@ for i, item in enumerate(st.session_state.lebensmittel):
         color = "green"
         icon = "🟢"
 
-    st.markdown(f"""
-    <div style='padding: 12px; margin: 8px 0; border-radius: 12px; background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border-left: 5px solid {color};'>
-        <strong style='color: {color}; font-size: 16px;'>{icon} {name}</strong>
-        <br>
-        <small style='color: #666;'>Ablauf: {date_str} ({days_left} Tage)</small>
-    </div>
-    """, unsafe_allow_html=True)
-
-        # Container mit Löschen-Button
+    # ✅ Jetzt: `with st.container()` in der `for`-Schleife
         with st.container():
             col1, col2 = st.columns([4, 1])
             with col1:
@@ -689,5 +681,6 @@ if expiring:
 # --- Footer ---
 st.markdown("---")
 st.markdown("💡 *NomNom – Dein persönlicher Küchenhelfer für weniger Verschwendung.*")
+
 
 
