@@ -585,51 +585,56 @@ with st.container():
         date_input = st.date_input("Ablaufdatum", value=datetime.date.today(), key="date_input")
         date_str = date_input.strftime("%d.%m.%Y")
 
-    if st.button("✅ Hinzufügen", key="add_btn"):
-        if not name:
-            st.warning("Bitte gib einen Namen ein.")
-        else:
-            try:
-                date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
-                days = DEFAULT_HALTBARKEIT.get(name, 7)
-                expected_date = date_obj + datetime.timedelta(days=days)
-                days_left = (date_obj - datetime.datetime.now()).days
+  if st.button("✅ Hinzufügen", key="add_btn"):
+    if not name:
+        st.warning("Bitte gib einen Namen ein.")
+    else:
+        try:
+            date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+            days = DEFAULT_HALTBARKEIT.get(name, 7)
+            expected_date = date_obj + datetime.timedelta(days=days)
+            days_left = (date_obj - datetime.datetime.now()).days  # ✅ Richtig: Tage bis zum Ablauf
 
-                st.session_state.lebensmittel.append({
-                    "name": name,
-                    "date": date_str,
-                    "expected": expected_date.strftime("%d.%m.%Y"),
-                    "days_left": days_left
-                })
-                save_data(st.session_state.lebensmittel)
-                st.success(f"✅ {name} hinzugefügt! Ablauf: {date_str}")
-            except Exception as e:
-                st.error(f"❌ Fehler: {e}")
+            st.session_state.lebensmittel.append({
+                "name": name,
+                "date": date_str,
+                "expected": expected_date.strftime("%d.%m.%Y"),
+                "days_left": days_left  # ✅ Jetzt richtig!
+            })
+            save_data(st.session_state.lebensmittel)
+            st.success(f"✅ {name} hinzugefügt! Ablauf: {date_str}")
+        except Exception as e:
+            st.error(f"❌ Fehler: {e}")
 
-# --- Liste der Lebensmittel mit Löschen-Button ---
-st.markdown("### 🛒 Dein NomNom")
+# In der Liste der Lebensmittel:
 now = datetime.datetime.now()
+for i, item in enumerate(st.session_state.lebensmittel):
+    name = item["name"]
+    date_str = item["date"]
+    date_obj = datetime.datetime.strptime(date_str, "%d.%m.%Y")
+    days_left = (date_obj - now).days  # ✅ Richtig: Tage bis zum Ablauf
 
-if st.session_state.lebensmittel:
-    for i, item in enumerate(st.session_state.lebensmittel):
-        name = item["name"]
-        date_str = item["date"]
-        expected_date = datetime.datetime.strptime(item["expected"], "%d.%m.%Y")
-        days_left = (expected_date - now).days
+    # Farbe basierend auf Tagen
+    if days_left <= 0:
+        color = "red"
+        icon = "💀"
+    elif days_left <= 3:
+        color = "orange"
+        icon = "⚠️"
+    elif days_left <= 7:
+        color = "yellow"
+        icon = "🟡"
+    else:
+        color = "green"
+        icon = "🟢"
 
-        # Farbe basierend auf Tagen
-        if days_left <= 0:
-            color = "red"
-            icon = "💀"
-        elif days_left <= 3:
-            color = "orange"
-            icon = "⚠️"
-        elif days_left <= 7:
-            color = "yellow"
-            icon = "🟡"
-        else:
-            color = "green"
-            icon = "🟢"
+    st.markdown(f"""
+    <div style='padding: 12px; margin: 8px 0; border-radius: 12px; background: white; box-shadow: 0 2px 6px rgba(0,0,0,0.1); border-left: 5px solid {color};'>
+        <strong style='color: {color}; font-size: 16px;'>{icon} {name}</strong>
+        <br>
+        <small style='color: #666;'>Ablauf: {date_str} ({days_left} Tage)</small>
+    </div>
+    """, unsafe_allow_html=True)
 
         # Container mit Löschen-Button
         with st.container():
@@ -683,3 +688,4 @@ if expiring:
 # --- Footer ---
 st.markdown("---")
 st.markdown("💡 *NomNom – Dein persönlicher Küchenhelfer für weniger Verschwendung.*")
+
